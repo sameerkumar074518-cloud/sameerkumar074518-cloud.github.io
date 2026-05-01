@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>🎵 Music Quiz PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+ margin:0;
+ font-family:Poppins;
+ background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+ color:white;
+ text-align:center;
+}
+
+/* CATEGORY */
+.container{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+ gap:15px;
+ padding:20px;
+}
+
+.card{
+ background:rgba(0,0,0,0.6);
+ padding:15px;
+ border-radius:12px;
+ cursor:pointer;
+ transition:0.3s;
+}
+.card:hover{
+ transform:scale(1.05);
+ box-shadow:0 0 15px cyan;
+}
+
+/* QUIZ */
+#quiz{ display:none; }
+
+button{
+ display:block;
+ width:80%;
+ margin:10px auto;
+ padding:12px;
+ border:none;
+ border-radius:10px;
+ font-size:16px;
+ cursor:pointer;
+ background:#111;
+ color:white;
+}
+
+button:hover{
+ background:#00c6ff;
+ color:black;
+}
+
+.correct{background:#00e676 !important;}
+.wrong{background:#ff5252 !important;}
+
+#playBtn{
+ background:linear-gradient(45deg,#ff416c,#ff4b2b);
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎵 Music Quiz</h1>
+<p>Select Category</p>
+
+<div class="container">
+ <div class="card" onclick="start('easy')">🎧 Easy</div>
+ <div class="card" onclick="start('medium')">🔥 Medium</div>
+ <div class="card" onclick="start('hard')">💀 Hard</div>
+</div>
+
+<div id="quiz">
+ <h2>Guess the Tune 🎶</h2>
+
+ <button id="playBtn" onclick="playSong()">▶ Play</button>
+
+ <button onclick="answer(0)" id="opt0"></button>
+ <button onclick="answer(1)" id="opt1"></button>
+ <button onclick="answer(2)" id="opt2"></button>
+ <button onclick="answer(3)" id="opt3"></button>
+
+ <h2 id="result"></h2>
+ <button onclick="restart()">Restart</button>
+</div>
+
+<script>
+
+/* 🎵 FREE ONLINE AUDIO (NO DOWNLOAD) */
+let data={
+easy:[
+{
+song:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+o:["Chill Beat","Romantic Track","Sad Song","Dance Mix"],a:0
+},
+{
+song:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+o:["Dance Track","LoFi Beat","Rock Song","Hip Hop"],a:1
+}
+],
+
+medium:[
+{
+song:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+o:["Epic Music","Gaming Track","Battle Theme","Relaxing"],a:2
+},
+{
+song:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+o:["Club Music","Slow Piano","Jazz","EDM"],a:3
+}
+],
+
+hard:[
+{
+song:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+o:["Orchestra","Cinematic","Ambient","Electronic"],a:1
+},
+{
+song:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+o:["Heavy Bass","Trap","Pop","Folk"],a:0
+}
+]
+};
+
+let current=[],i=0,score=0,audio;
+
+/* START */
+function start(type){
+ document.querySelector(".container").style.display="none";
+ document.getElementById("quiz").style.display="block";
+
+ current=shuffle(data[type]);
+ i=0; score=0;
+
+ loadQ();
+}
+
+/* LOAD */
+function loadQ(){
+ let q=current[i];
+
+ opt0.innerText=q.o[0];
+ opt1.innerText=q.o[1];
+ opt2.innerText=q.o[2];
+ opt3.innerText=q.o[3];
+
+ audio=new Audio(q.song);
+}
+
+/* PLAY */
+function playSong(){
+ audio.currentTime=0;
+ audio.play();
+}
+
+/* ANSWER */
+function answer(c){
+ audio.pause();
+
+ if(c===current[i].a){
+  score++;
+  event.target.classList.add("correct");
+ } else {
+  event.target.classList.add("wrong");
+ }
+
+ setTimeout(next,700);
+}
+
+/* NEXT */
+function next(){
+ document.querySelectorAll("button").forEach(b=>{
+  b.classList.remove("correct","wrong");
+ });
+
+ i++;
+
+ if(i<current.length){
+  loadQ();
+ } else {
+  result.innerText="🔥 Score: "+score+"/"+current.length;
+ }
+}
+
+/* RESTART */
+function restart(){
+ location.reload();
+}
+
+/* SHUFFLE */
+function shuffle(arr){
+ return arr.sort(()=>Math.random()-0.5);
+}
+
+</script>
+
+</body>
+</html>

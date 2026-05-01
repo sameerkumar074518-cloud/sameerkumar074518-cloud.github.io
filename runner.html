@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Runner PRO+</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+ margin:0;
+ background:black;
+ color:white;
+ font-family:Poppins;
+ text-align:center;
+ overflow:hidden;
+}
+
+h1{ margin:10px; }
+
+canvas{
+ background:linear-gradient(#111,#222);
+ display:block;
+ margin:auto;
+}
+
+/* CONTROLS */
+.controls{
+ position:fixed;
+ bottom:20px;
+ width:100%;
+ display:flex;
+ justify-content:center;
+ gap:15px;
+}
+
+.btn{
+ padding:15px 25px;
+ border:none;
+ border-radius:10px;
+ font-size:16px;
+ background:red;
+ color:white;
+}
+
+/* GAME OVER */
+#gameOver{
+ position:absolute;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ display:none;
+}
+
+#gameOver button{
+ padding:10px 20px;
+ background:red;
+ border:none;
+ border-radius:8px;
+ color:white;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏃 Runner PRO+</h1>
+<h2>Score: <span id="score">0</span></h2>
+
+<canvas id="game" width="400" height="400"></canvas>
+
+<div id="gameOver">
+  <h2>Game Over</h2>
+  <button onclick="restart()">Restart</button>
+</div>
+
+<!-- MOBILE CONTROLS -->
+<div class="controls">
+  <button class="btn" onclick="jump()">⬆ Jump</button>
+  <button class="btn" onclick="duck()">⬇ Slide</button>
+</div>
+
+<script>
+let c=document.getElementById("game");
+let ctx=c.getContext("2d");
+
+let player={
+ x:50,
+ y:300,
+ w:30,
+ h:50,
+ vy:0,
+ jumping:false,
+ ducking:false
+};
+
+let gravity=1;
+let obstacles=[];
+let frame=0;
+let speed=4;
+let score=0;
+let running=true;
+
+/* 🎮 INPUT */
+document.addEventListener("keydown",e=>{
+ if(e.code==="Space"||e.key==="ArrowUp") jump();
+ if(e.key==="ArrowDown") duck();
+});
+
+/* 🦘 JUMP */
+function jump(){
+ if(!player.jumping){
+  player.vy=-15;
+  player.jumping=true;
+ }
+}
+
+/* ⬇ DUCK */
+function duck(){
+ player.ducking=true;
+ player.h=25;
+
+ setTimeout(()=>{
+  player.ducking=false;
+  player.h=50;
+ },500);
+}
+
+/* 🧱 SPAWN OBSTACLES */
+function spawn(){
+ let type=Math.random();
+
+ if(type<0.5){
+  // ground obstacle
+  obstacles.push({x:400,y:310,w:20,h:40});
+ } else {
+  // high obstacle (need duck)
+  obstacles.push({x:400,y:260,w:20,h:20});
+ }
+}
+
+/* 🔁 LOOP */
+function loop(){
+ if(!running) return;
+
+ frame++;
+ if(frame%90===0) spawn();
+
+ // PLAYER PHYSICS
+ player.vy+=gravity;
+ player.y+=player.vy;
+
+ if(player.y>=300){
+  player.y=300;
+  player.jumping=false;
+ }
+
+ // DRAW
+ ctx.clearRect(0,0,400,400);
+
+ // PLAYER (HUMAN STYLE)
+ ctx.fillStyle="cyan";
+
+ // head
+ ctx.beginPath();
+ ctx.arc(player.x+15,player.y-10,10,0,Math.PI*2);
+ ctx.fill();
+
+ // body
+ ctx.fillRect(player.x+12,player.y,6,30);
+
+ // legs
+ ctx.fillRect(player.x+5,player.y+30,6,20);
+ ctx.fillRect(player.x+20,player.y+30,6,20);
+
+ // arms animation
+ let armSwing = Math.sin(frame/5)*10;
+ ctx.fillRect(player.x-5,player.y+10,10,5);
+ ctx.fillRect(player.x+20,player.y+10,10,5);
+
+ // OBSTACLES
+ ctx.fillStyle="red";
+ obstacles.forEach(o=>{
+  o.x-=speed;
+  ctx.fillRect(o.x,o.y,o.w,o.h);
+
+  // COLLISION
+  if(
+   player.x < o.x+o.w &&
+   player.x+player.w > o.x &&
+   player.y < o.y+o.h &&
+   player.y+player.h > o.y
+  ){
+   endGame();
+  }
+ });
+
+ obstacles=obstacles.filter(o=>o.x>-20);
+
+ // SCORE
+ score++;
+ document.getElementById("score").innerText=score;
+
+ // DIFFICULTY
+ if(score%200===0) speed+=0.5;
+
+ requestAnimationFrame(loop);
+}
+
+/* 💀 END */
+function endGame(){
+ running=false;
+ document.getElementById("gameOver").style.display="block";
+}
+
+/* 🔄 RESTART */
+function restart(){
+ location.reload();
+}
+
+loop();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Whack Game PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+ margin:0;
+ background:#0f2027;
+ color:white;
+ text-align:center;
+ font-family:Poppins;
+}
+
+/* HEADER */
+h2{margin-top:10px;}
+
+#stats{
+ display:flex;
+ justify-content:center;
+ gap:20px;
+ margin:10px;
+}
+
+/* GRID */
+#grid{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:15px;
+ padding:20px;
+ max-width:320px;
+ margin:auto;
+}
+
+/* HOLES */
+.hole{
+ width:90px;
+ height:90px;
+ background:#222;
+ border-radius:50%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ transition:0.2s;
+ box-shadow:inset 0 5px 10px black;
+}
+
+.active{
+ background:lime;
+ animation:pop 0.2s ease;
+}
+
+.bomb{
+ background:red;
+ animation:pop 0.2s ease;
+}
+
+@keyframes pop{
+ from{transform:scale(0);}
+ to{transform:scale(1);}
+}
+
+/* GAME OVER */
+#gameOver{
+ display:none;
+ margin-top:20px;
+}
+
+button{
+ padding:12px 20px;
+ border:none;
+ border-radius:10px;
+ background:#ff416c;
+ color:white;
+ font-size:16px;
+ cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>💣 Whack Game PRO</h2>
+
+<div id="stats">
+ <div>Score: <span id="score">0</span></div>
+ <div>🏆 High: <span id="high">0</span></div>
+</div>
+
+<div id="grid"></div>
+
+<div id="gameOver">
+ <h2>Game Over</h2>
+ <button onclick="restart()">Restart</button>
+</div>
+
+<script>
+let score=0;
+let highScore=localStorage.getItem("whackHigh") || 0;
+document.getElementById("high").innerText=highScore;
+
+let grid=document.getElementById("grid");
+let holes=[];
+let speed=800;
+let gameRunning=true;
+
+/* CREATE GRID */
+for(let i=0;i<9;i++){
+ let d=document.createElement("div");
+ d.className="hole";
+ grid.appendChild(d);
+ holes.push(d);
+}
+
+/* SOUND (simple) */
+function beep(freq){
+ let ctx=new (window.AudioContext||window.webkitAudioContext)();
+ let osc=ctx.createOscillator();
+ osc.frequency.value=freq;
+ osc.connect(ctx.destination);
+ osc.start();
+ setTimeout(()=>osc.stop(),100);
+}
+
+/* SPAWN */
+function spawn(){
+ if(!gameRunning) return;
+
+ holes.forEach(h=>{
+  h.className="hole";
+  h.onclick=null;
+ });
+
+ let i=Math.floor(Math.random()*9);
+ let isBomb=Math.random()<0.25;
+
+ let hole=holes[i];
+ hole.classList.add(isBomb?"bomb":"active");
+
+ hole.onclick=()=>{
+  if(!gameRunning) return;
+
+  if(isBomb){
+   beep(200);
+   endGame();
+  } else {
+   beep(600);
+   score++;
+   document.getElementById("score").innerText=score;
+
+   // increase difficulty
+   if(score%5===0 && speed>300){
+    speed-=50;
+   }
+  }
+ };
+}
+
+/* LOOP */
+let loop=setInterval(()=>{
+ spawn();
+},speed);
+
+/* GAME OVER */
+function endGame(){
+ gameRunning=false;
+ clearInterval(loop);
+
+ if(score>highScore){
+  localStorage.setItem("whackHigh",score);
+ }
+
+ document.getElementById("gameOver").style.display="block";
+}
+
+/* RESTART */
+function restart(){
+ location.reload();
+}
+</script>
+
+</body>
+</html>

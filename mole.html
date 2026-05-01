@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mole</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  text-align:center;
+  font-family:Poppins;
+  background:linear-gradient(135deg,#1d4350,#a43931);
+  color:white;
+}
+
+h1{margin-top:10px;}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(3,90px);
+ gap:12px;
+ justify-content:center;
+ margin-top:20px;
+}
+
+.box{
+ width:90px;height:90px;
+ background:#222;
+ border-radius:12px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ font-size:40px;
+ cursor:pointer;
+ transition:0.2s;
+}
+
+.box:hover{transform:scale(1.05);}
+
+.active{
+ background:#ff5252;
+}
+
+.controls{
+ margin-top:20px;
+}
+
+button{
+ padding:10px 20px;
+ border:none;
+ border-radius:8px;
+ cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🎯 Whack-a-Mole</h1>
+
+<h2>Score: <span id="score">0</span></h2>
+<h3>⏱ Time: <span id="time">30</span>s</h3>
+<h3>🏆 High Score: <span id="high">0</span></h3>
+
+<div class="grid" id="grid"></div>
+
+<div class="controls">
+<button onclick="startGame()">Start</button>
+<button onclick="restart()">Restart</button>
+</div>
+
+<script>
+let score=0;
+let time=30;
+let interval, timer;
+let speed=700;
+
+let high=localStorage.getItem("moleHigh")||0;
+document.getElementById("high").innerText=high;
+
+let boxes=[];
+let grid=document.getElementById("grid");
+
+// CREATE BOXES
+for(let i=0;i<9;i++){
+ let d=document.createElement("div");
+ d.className="box";
+
+ d.onclick=()=>{
+  if(d.classList.contains("active")){
+   score++;
+   document.getElementById("score").innerText=score;
+   d.classList.remove("active");
+   d.innerText="";
+  }
+ };
+
+ boxes.push(d);
+ grid.appendChild(d);
+}
+
+// START GAME
+function startGame(){
+ clearInterval(interval);
+ clearInterval(timer);
+
+ score=0;
+ time=30;
+ speed=700;
+
+ document.getElementById("score").innerText=score;
+ document.getElementById("time").innerText=time;
+
+ spawn();
+ interval=setInterval(spawn, speed);
+
+ timer=setInterval(()=>{
+  time--;
+  document.getElementById("time").innerText=time;
+
+  // increase difficulty
+  if(time%5==0 && speed>300){
+    speed-=80;
+    clearInterval(interval);
+    interval=setInterval(spawn,speed);
+  }
+
+  if(time<=0){
+    endGame();
+  }
+
+ },1000);
+}
+
+// SPAWN MOLE
+function spawn(){
+ boxes.forEach(b=>{
+  b.classList.remove("active");
+  b.innerText="";
+ });
+
+ let r=Math.floor(Math.random()*9);
+ boxes[r].classList.add("active");
+ boxes[r].innerText="🐹";
+}
+
+// END GAME
+function endGame(){
+ clearInterval(interval);
+ clearInterval(timer);
+
+ boxes.forEach(b=>{
+  b.classList.remove("active");
+  b.innerText="";
+ });
+
+ if(score>high){
+  high=score;
+  localStorage.setItem("moleHigh",high);
+  document.getElementById("high").innerText=high;
+ }
+
+ alert("Game Over! Score: "+score);
+}
+
+// RESTART
+function restart(){
+ startGame();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Reaction PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+ margin:0;
+ height:100vh;
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+ background:#0f172a;
+ color:white;
+ font-family:Poppins;
+ text-align:center;
+}
+
+/* BOX */
+#box{
+ width:260px;
+ height:260px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ border-radius:20px;
+ background:#dc2626;
+ font-size:22px;
+ transition:0.2s;
+ box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+/* STATS */
+#stats{
+ margin-top:15px;
+}
+
+/* BUTTONS */
+.controls{
+ margin-top:20px;
+ display:flex;
+ gap:10px;
+}
+
+button{
+ padding:12px 20px;
+ border:none;
+ border-radius:10px;
+ background:#ff416c;
+ color:white;
+ font-size:16px;
+ cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>⚡ Reaction PRO</h2>
+
+<div id="box">Tap Start</div>
+
+<div id="stats">
+ <p>🏆 Best: <span id="best">--</span> ms</p>
+</div>
+
+<div class="controls">
+ <button onclick="startGame()">Start</button>
+ <button onclick="restart()">Restart</button>
+</div>
+
+<script>
+let box=document.getElementById("box");
+let startTime, ready=false, waiting=false;
+
+let best=localStorage.getItem("reactionBest");
+document.getElementById("best").innerText = best || "--";
+
+/* SOUND */
+function beep(freq){
+ let ctx=new (window.AudioContext||window.webkitAudioContext)();
+ let osc=ctx.createOscillator();
+ osc.frequency.value=freq;
+ osc.connect(ctx.destination);
+ osc.start();
+ setTimeout(()=>osc.stop(),100);
+}
+
+/* START GAME */
+function startGame(){
+ ready=false;
+ waiting=true;
+
+ box.innerText="Wait...";
+ box.style.background="#dc2626";
+
+ setTimeout(()=>{
+  box.style.background="#22c55e";
+  box.innerText="TAP!";
+  startTime=performance.now();
+  ready=true;
+  waiting=false;
+  beep(800);
+ }, Math.random()*3000+2000);
+}
+
+/* CLICK / TOUCH */
+function handleTap(){
+ if(waiting){
+  box.innerText="Too Early! ❌";
+  box.style.background="#f97316";
+  beep(200);
+  return;
+ }
+
+ if(!ready) return;
+
+ let time=Math.floor(performance.now()-startTime);
+ box.innerText=time+" ms";
+ box.style.background="#2563eb";
+ beep(600);
+
+ // save high score
+ if(!best || time < best){
+  localStorage.setItem("reactionBest",time);
+  document.getElementById("best").innerText=time;
+ }
+}
+
+/* EVENTS (PC + MOBILE) */
+box.addEventListener("click",handleTap);
+box.addEventListener("touchstart",handleTap);
+
+/* RESTART */
+function restart(){
+ box.innerText="Tap Start";
+ box.style.background="#dc2626";
+ ready=false;
+ waiting=false;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Color Switch PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+ margin:0;
+ overflow:hidden;
+ background:black;
+ font-family:Poppins;
+ text-align:center;
+ color:white;
+}
+
+h2{
+ position:fixed;
+ top:10px;
+ width:100%;
+}
+
+#score{
+ font-size:20px;
+}
+
+/* BALL */
+#ball{
+ width:18px;
+ height:18px;
+ border-radius:50%;
+ position:absolute;
+ left:50%;
+ transform:translateX(-50%);
+ top:70%;
+ box-shadow:0 0 10px white;
+}
+
+/* ROTATING CIRCLE */
+#circle{
+ position:absolute;
+ top:40%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ width:200px;
+ height:200px;
+ border-radius:50%;
+ animation:rotate 3s linear infinite;
+}
+
+.segment{
+ position:absolute;
+ width:100%;
+ height:100%;
+ border-radius:50%;
+ clip-path:polygon(50% 50%, 100% 0, 100% 100%);
+}
+
+@keyframes rotate{
+ from{transform:translate(-50%,-50%) rotate(0deg);}
+ to{transform:translate(-50%,-50%) rotate(360deg);}
+}
+
+/* GAME OVER */
+#gameOver{
+ display:none;
+ position:fixed;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+}
+
+button{
+ padding:10px 20px;
+ border:none;
+ background:red;
+ color:white;
+ border-radius:10px;
+ cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>🎨 Color Switch PRO | Score: <span id="score">0</span></h2>
+
+<div id="ball"></div>
+
+<div id="circle">
+ <div class="segment" style="background:red; transform:rotate(0deg)"></div>
+ <div class="segment" style="background:blue; transform:rotate(90deg)"></div>
+ <div class="segment" style="background:green; transform:rotate(180deg)"></div>
+ <div class="segment" style="background:yellow; transform:rotate(270deg)"></div>
+</div>
+
+<div id="gameOver">
+ <h2>Game Over</h2>
+ <button onclick="location.reload()">Restart</button>
+</div>
+
+<script>
+let ball=document.getElementById("ball");
+let scoreEl=document.getElementById("score");
+let colors=["red","blue","green","yellow"];
+
+let y=window.innerHeight*0.7;
+let velocity=0;
+let gravity=0.5;
+let lift=-8;
+
+let ballColor=colors[Math.floor(Math.random()*4)];
+ball.style.background=ballColor;
+
+let score=0;
+let running=true;
+
+/* JUMP */
+function jump(){
+ velocity=lift;
+}
+
+document.addEventListener("click",jump);
+document.addEventListener("touchstart",jump);
+
+/* GAME LOOP */
+function loop(){
+ if(!running) return;
+
+ velocity+=gravity;
+ y+=velocity;
+
+ if(y>window.innerHeight-30){
+  gameOver();
+ }
+
+ ball.style.top=y+"px";
+
+ checkCollision();
+
+ requestAnimationFrame(loop);
+}
+loop();
+
+/* COLLISION */
+function checkCollision(){
+ let circle=document.getElementById("circle");
+ let rect=circle.getBoundingClientRect();
+
+ if(y > rect.top && y < rect.bottom){
+  let segments=document.querySelectorAll(".segment");
+
+  let hit=false;
+
+  segments.forEach(seg=>{
+   let color=seg.style.background;
+   if(color===ballColor){
+    hit=true;
+   }
+  });
+
+  if(!hit){
+   gameOver();
+  } else {
+   score++;
+   scoreEl.innerText=score;
+
+   // change color
+   ballColor=colors[Math.floor(Math.random()*4)];
+   ball.style.background=ballColor;
+
+   // increase difficulty
+   circle.style.animationDuration = Math.max(1.5, 3 - score*0.05) + "s";
+  }
+ }
+}
+
+/* GAME OVER */
+function gameOver(){
+ running=false;
+ document.getElementById("gameOver").style.display="block";
+}
+</script>
+
+</body>
+</html>
