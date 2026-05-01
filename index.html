@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+
+    <!-- ICONS -->
+    <link rel="icon" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- META -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+
+    <title>GameHub</title>
+</head>
+
+<style>
+body{
+ margin:0;
+ font-family:Poppins;
+ color:white;
+ overflow-x:hidden;
+}
+
+/* 🎥 VIDEO */
+#bg-video{
+ position:fixed;
+ width:100%;
+ height:100%;
+ object-fit:cover;
+ z-index:-2;
+ filter:brightness(35%);
+}
+
+/* 🌌 PARTICLES */
+#particles{
+ position:fixed;
+ width:100%;
+ height:100%;
+ z-index:-1;
+}
+
+/* 🧭 NAVBAR */
+nav{
+ display:flex;
+ justify-content:space-between;
+ padding:15px 30px;
+ background:rgba(0,0,0,0.6);
+ backdrop-filter:blur(10px);
+ position:sticky;
+ top:0;
+ z-index:10;
+}
+
+nav h2{
+ color:cyan;
+ text-shadow:0 0 10px cyan;
+}
+
+nav .right{
+ display:flex;
+ gap:15px;
+ align-items:center;
+}
+
+#logout{
+ background:red;
+ border:none;
+ padding:6px 10px;
+ color:white;
+ border-radius:5px;
+ cursor:pointer;
+}
+
+/* 🎬 INTRO */
+#intro{
+ position:fixed;
+ width:100%;
+ height:100%;
+ background:black;
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+ z-index:9999;
+ text-align:center;
+}
+
+#introText{
+ font-size:32px;
+ text-shadow:0 0 20px red;
+}
+
+#introQuote{
+ color:#aaa;
+ margin-top:10px;
+}
+
+/* 🔴 LOADER */
+.loader{
+ width:60%;
+ height:5px;
+ background:#222;
+ margin-top:30px;
+ overflow:hidden;
+}
+
+.progress{
+ height:100%;
+ width:0;
+ background:red;
+ animation:load 4s linear forwards;
+}
+
+@keyframes load{
+ from{width:0;}
+ to{width:100%;}
+}
+
+/* 🔐 NETFLIX LOGIN */
+#login{
+ position:fixed;
+ width:100%;
+ height:100%;
+ background:rgba(0,0,0,0.85);
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ z-index:9000;
+ display:none;
+}
+
+.login-box{
+ background:rgba(0,0,0,0.8);
+ padding:30px;
+ border-radius:10px;
+ text-align:center;
+ width:300px;
+}
+
+.login-box h2{
+ margin-bottom:20px;
+}
+
+.login-box input{
+ width:100%;
+ padding:10px;
+ margin:10px 0;
+ border:none;
+ border-radius:5px;
+}
+
+.login-box button{
+ width:100%;
+ padding:10px;
+ background:red;
+ border:none;
+ color:white;
+ border-radius:5px;
+ cursor:pointer;
+}
+
+/* 🎬 HERO */
+.hero{
+ text-align:center;
+ margin-top:60px;
+}
+
+.hero h1{
+ font-size:42px;
+ text-shadow:0 0 20px cyan;
+}
+
+.hero p{
+ color:#ccc;
+}
+
+/* 🎮 GRID */
+.container{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+ gap:20px;
+ padding:30px;
+}
+
+/* 🎮 CARD */
+.card{
+ background:rgba(0,0,0,0.6);
+ border:1px solid rgba(0,255,255,0.3);
+ padding:20px;
+ border-radius:15px;
+ text-align:center;
+ transition:0.3s;
+ backdrop-filter:blur(10px);
+}
+
+.card:hover{
+ transform:translateY(-10px) scale(1.05);
+ box-shadow:0 0 25px cyan;
+}
+
+.card a{
+ display:inline-block;
+ margin-top:10px;
+ padding:8px 15px;
+ border-radius:8px;
+ background:linear-gradient(45deg,#ff416c,#ff4b2b);
+ color:white;
+ text-decoration:none;
+}
+
+/* 👤 OWNER */
+.owner-box{
+ text-align:center;
+ margin:30px;
+}
+
+/* FOOTER */
+footer{
+ text-align:center;
+ padding:20px;
+ color:#aaa;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- 🎬 INTRO -->
+<div id="intro">
+  <h1 id="introText"></h1>
+  <p id="introQuote">"Enter the world. Play like a legend."</p>
+  <div class="loader"><div class="progress"></div></div>
+</div>
+
+<!-- 🔐 LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <h2>🎮 GameHub Login</h2>
+    <input type="text" id="usernameInput" placeholder="Enter your name">
+    <button onclick="saveUser()">Start Gaming</button>
+  </div>
+</div>
+
+<!-- 🎥 VIDEO -->
+<video autoplay muted loop playsinline id="bg-video">
+  <source src="video/bg.mp4" type="video/mp4">
+</video>
+
+<!-- 🌌 PARTICLES -->
+<canvas id="particles"></canvas>
+
+<!-- 🧭 NAVBAR -->
+<nav>
+  <h2>🎮 GameHub</h2>
+  <div class="right">
+    <span id="userWelcome"></span>
+    <input type="text" id="searchGame" placeholder="Search games..."
+style="padding:6px;border-radius:5px;border:none;">
+    <button id="logout" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<!-- 🎬 HERO -->
+<div class="hero">
+  <h1>Welcome to GameHub</h1>
+  <p>Play • Compete • Enjoy</p>
+</div>
+
+<!-- 🎮 GAME SECTIONS -->
+
+<style>
+.section-title{
+ text-align:center;
+ font-size:26px;
+ margin-top:40px;
+ color:cyan;
+ text-shadow:0 0 10px cyan;
+}
+
+.game-section{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+ gap:20px;
+ padding:20px 30px;
+}
+
+/* highlight popular */
+.popular .card{
+ border:2px solid gold;
+ box-shadow:0 0 15px gold;
+}
+
+/* new games glow */
+.new .card{
+ border:2px solid #00ffcc;
+ box-shadow:0 0 15px #00ffcc;
+}
+</style>
+
+<!-- 🔥 POPULAR GAMES -->
+<h2 class="section-title">🔥 Popular Games</h2>
+<div class="game-section popular">
+  <div class="card"><h2>🐦 Flappy Bird</h2><a href="games/flappy.html">Play</a></div>
+  <div class="card"><h2>🐍 Snake</h2><a href="games/snake.html">Play</a></div>
+  <div class="card"><h2>🧩 2048</h2><a href="games/2048.html">Play</a></div>
+  <div class="card"><h2>🎯 Aim Trainer</h2><a href="games/aim.html">Play</a></div>
+</div>
+
+<!-- ⚡ TRENDING -->
+<h2 class="section-title">⚡ Trending Now</h2>
+<div class="game-section">
+  <div class="card"><h2>🎯 Mole</h2><a href="games/mole.html">Play</a></div>
+  <div class="card"><h2>🧱 Breakout</h2><a href="games/breakout.html">Play</a></div>
+  <div class="card"><h2>⚡ Reaction</h2><a href="games/reaction.html">Play</a></div>
+  <div class="card"><h2>🏃 Runner</h2><a href="games/runner.html">Play</a></div>
+</div>
+
+
+
+<!-- 🆕 NEW / COOL -->
+<h2 class="section-title">🆕 New & Cool</h2>
+<div class="game-section new">
+  <div class="card"><h3>🎵 Beat Tap</h3><a href="games/beat.html">Play</a></div>
+  <div class="card"><h3>🔫 Shooting</h3><a href="games/shooting.html">Play</a></div>
+  <div class="card"><h3>🚗 Traffic Racer</h3><a href="games/traffic.html">Play</a></div>
+  <div class="card"><h3>🧠 IQ Game</h3><a href="games/iq.html">Play</a></div>
+</div>
+
+<!-- 🎮 ALL GAMES -->
+<h2 class="section-title">🎮 All Games</h2>
+<div class="game-section">
+  <div class="card"><h2>🐦 Flappy Bird</h2><a href="games/flappy.html">Play</a></div>
+  <div class="card"><h2>🐍 Snake</h2><a href="games/snake.html">Play</a></div>
+  <div class="card"><h2>🧩 2048</h2><a href="games/2048.html">Play</a></div>
+  <div class="card"><h2>🎯 Aim Trainer</h2><a href="games/aim.html">Play</a></div>
+  <div class="card"><h2>🎯 Mole</h2><a href="games/mole.html">Play</a></div>
+  <div class="card"><h2>🧱 Breakout</h2><a href="games/breakout.html">Play</a></div>
+  <div class="card"><h2>⚡ Reaction</h2><a href="games/reaction.html">Play</a></div>
+  <div class="card"><h2>🏃 Runner</h2><a href="games/runner.html">Play</a></div>
+  <div class="card"><h3>🎵 Beat Tap</h3><a href="games/beat.html">Play</a></div>
+  <div class="card"><h3>🔫 Shooting</h3><a href="games/shooting.html">Play</a></div>
+  <div class="card"><h3>🚗 Traffic Racer</h3><a href="games/traffic.html">Play</a></div>
+  <div class="card"><h3>🧠 IQ Game</h3><a href="games/iq.html">Play</a></div>
+</div>
+
+<!-- 🔥 FEATURED GAME -->
+<div style="text-align:center;margin-top:20px;">
+  <h2 style="color:gold;">🔥 Featured Game</h2>
+  <div class="card" style="max-width:250px;margin:auto;">
+    <h2>🐦 Flappy Bird</h2>
+    <a href="games/flappy.html">Play Now</a>
+  </div>
+</div>
+
+<!-- 🎯 DAILY CHALLENGE -->
+<div style="text-align:center;margin-top:30px;">
+  <h2>🎯 Daily Challenge</h2>
+  <p>Try to beat your best score today!</p>
+
+  <a href="games/snake.html" style="
+    padding:10px 20px;
+    background:cyan;
+    color:black;
+    border-radius:8px;
+    text-decoration:none;">
+    Play Challenge
+  </a>
+</div>
+
+<!-- 🏆 LEADERBOARD (NEW) -->
+<div style="max-width:600px;margin:20px auto;background:rgba(0,0,0,0.6);padding:20px;border-radius:15px;text-align:center;">
+  <h2>🏆 Top Players</h2>
+  <ul id="leaderboard" style="list-style:none;padding:0;"></ul>
+</div>
+
+<!-- 👤 OWNER -->
+<div class="owner-box">
+  <h2>⚡ Created by Sameer Kumar</h2>
+  <p>📧 sameerkumar074518@gmail.com</p>
+  <p>"Gaming is not escape, it's experience."</p>
+  <p style="margin-top:10px;color:#ff4b2b;">
+    🚧 Build in process... More exciting games coming soon!
+  </p>
+</div>
+
+<!-- ⭐ USER FEEDBACK SYSTEM -->
+<div style="max-width:600px;margin:20px auto;background:rgba(0,0,0,0.6);padding:20px;border-radius:15px;text-align:center;">
+
+<h2>⭐ Rate GameHub</h2>
+
+<div>
+ <span onclick="setRating(1)" style="font-size:25px;cursor:pointer;">⭐</span>
+ <span onclick="setRating(2)" style="font-size:25px;cursor:pointer;">⭐</span>
+ <span onclick="setRating(3)" style="font-size:25px;cursor:pointer;">⭐</span>
+ <span onclick="setRating(4)" style="font-size:25px;cursor:pointer;">⭐</span>
+ <span onclick="setRating(5)" style="font-size:25px;cursor:pointer;">⭐</span>
+</div>
+
+<p>Average Rating: <span id="avgRating">0</span>/5</p>
+
+<textarea id="reviewInput" placeholder="Write your review..." style="width:100%;padding:10px;margin-top:10px;border-radius:5px;"></textarea>
+
+<input id="suggestInput" placeholder="Suggest a new game..." style="width:100%;padding:10px;margin-top:10px;border-radius:5px;">
+
+<button onclick="saveFeedback()" style="margin-top:10px;padding:10px 20px;background:#ff416c;color:white;border:none;border-radius:5px;">
+ Submit
+</button>
+
+</div>
+
+<footer>🔥 Made with passion by Sameer Kumar</footer>
+
+<!-- 🎬 INTRO SCRIPT -->
+<script>
+let text="🎮 Welcome to Game Hub";
+let i=0;
+function typeIntro(){
+ if(i<text.length){
+  introText.innerHTML+=text.charAt(i);
+  i++;
+  setTimeout(typeIntro,50);
+ }
+}
+typeIntro();
+
+setTimeout(()=>{
+ intro.style.opacity="0";
+ intro.style.transition="1s";
+},4000);
+
+setTimeout(()=>{
+ intro.style.display="none";
+ document.getElementById("login").style.display="flex";
+},5000);
+</script>
+
+<!-- 👤 USER -->
+<script>
+function saveUser(){
+ let name=document.getElementById("usernameInput").value.trim();
+ if(name===""){
+  alert("Enter your name!");
+  return;
+ }
+ localStorage.setItem("username",name);
+ document.getElementById("login").style.display="none";
+ loadUser();
+}
+
+function loadUser(){
+ let user=localStorage.getItem("username");
+ if(!user){
+  document.getElementById("login").style.display="flex";
+ } else {
+  document.getElementById("userWelcome").innerText="👤 "+user;
+ }
+}
+
+function logout(){
+ localStorage.removeItem("username");
+ location.reload();
+}
+
+window.onload=loadUser;
+</script>
+
+<!-- 🌌 PARTICLES -->
+<script>
+let c=document.getElementById("particles");
+let ctx=c.getContext("2d");
+c.width=innerWidth;
+c.height=innerHeight;
+
+let p=[];
+for(let i=0;i<80;i++){
+ p.push({x:Math.random()*c.width,y:Math.random()*c.height,dx:Math.random()-0.5,dy:Math.random()-0.5});
+}
+
+function anim(){
+ ctx.clearRect(0,0,c.width,c.height);
+ ctx.fillStyle="white";
+ p.forEach(a=>{
+  ctx.beginPath();
+  ctx.arc(a.x,a.y,2,0,Math.PI*2);
+  ctx.fill();
+  a.x+=a.dx;
+  a.y+=a.dy;
+ });
+ requestAnimationFrame(anim);
+}
+anim();
+</script>
+
+<!-- ✅ SERVICE WORKER (FIXED POSITION) -->
+<script>
+if ("serviceWorker" in navigator) {
+ navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+<script>
+let selectedRating = 0;
+
+/* ⭐ SELECT RATING */
+function setRating(r){
+ selectedRating = r;
+}
+
+/* 💾 SAVE FEEDBACK */
+function saveFeedback(){
+ let review = document.getElementById("reviewInput").value;
+ let suggest = document.getElementById("suggestInput").value;
+
+ if(selectedRating === 0){
+  alert("Please select rating ⭐");
+  return;
+ }
+
+ let data = JSON.parse(localStorage.getItem("feedbackData") || "[]");
+
+ data.push({
+  rating: selectedRating,
+  review: review,
+  suggest: suggest
+ });
+
+ localStorage.setItem("feedbackData", JSON.stringify(data));
+
+ updateAverage(); // 🔥 UPDATE IMMEDIATELY
+
+ // clear inputs
+ document.getElementById("reviewInput").value = "";
+ document.getElementById("suggestInput").value = "";
+ selectedRating = 0;
+}
+
+/* 📊 CALCULATE AVG */
+function updateAverage(){
+ let data = JSON.parse(localStorage.getItem("feedbackData") || "[]");
+
+ let total = 0;
+ data.forEach(d => total += d.rating);
+
+ let avg = data.length ? (total / data.length).toFixed(1) : 0;
+
+ document.getElementById("avgRating").innerText = avg;
+}
+
+/* 🔄 LOAD ON START */
+updateAverage();
+</script>
+
+<script>
+// NEW 🎮 SAVE SCORE WHEN GAME CLICKED
+document.querySelectorAll(".card a").forEach(link => {
+  link.addEventListener("click", function () {
+
+    let user = localStorage.getItem("username") || "Guest";
+    let game = this.parentElement.innerText.replace("Play","").trim();
+    let score = Math.floor(Math.random() * 100); // demo score
+
+    let scores = JSON.parse(localStorage.getItem("scores") || "[]");
+
+    scores.push({
+      user: user,
+      game: game,
+      score: score
+    });
+
+    localStorage.setItem("scores", JSON.stringify(scores));
+  });
+});
+
+
+// NEW 🏆 SHOW LEADERBOARD
+function showLeaderboard(){
+  let scores = JSON.parse(localStorage.getItem("scores") || "[]");
+
+  // ❌ remove zero scores
+  scores = scores.filter(s => s.score > 0);
+
+  // 🔽 sort highest first
+  scores.sort((a,b)=> b.score - a.score);
+
+  let list = document.getElementById("leaderboard");
+  if(!list) return;
+
+  list.innerHTML = "";
+
+  // 🥇🥈🥉 medals
+  let medals = ["🥇","🥈","🥉"];
+
+  scores.slice(0,5).forEach((s,index)=>{
+    let li = document.createElement("li");
+
+    let medal = medals[index] || "🏅";
+
+    li.innerText = `${medal} ${s.user} - ${s.score}`;
+
+    list.appendChild(li);
+  });
+}
+
+// LOAD leaderboard on start
+showLeaderboard();
+</script>
+
+<script>
+document.getElementById("searchGame").addEventListener("keyup", function(){
+ let input = this.value.toLowerCase();
+ let cards = document.querySelectorAll(".card");
+
+ cards.forEach(card=>{
+  let text = card.innerText.toLowerCase();
+  card.style.display = text.includes(input) ? "block" : "none";
+ });
+});
+</script>
+
+
+
+</body>
+</html>
